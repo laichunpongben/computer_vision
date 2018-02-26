@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 def train(zone):
     batch_size = 128
     num_classes = 2
-    epochs = 50
+    epochs = 100
 
     img_rows, img_cols = 25, 25
 
@@ -26,7 +26,19 @@ def train(zone):
     print(x.shape)
     print(y.shape)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+    to_remove = []
+    threshold = 0.1
+    for i in range(x.shape[0]):
+        if np.all(x[i] <= threshold):
+            to_remove.append(i)
+
+    # print(to_remove)
+    x = np.delete(x, to_remove, 0)
+    y = np.delete(y, to_remove, 0)
+    print(x.shape)
+    print(y.shape)
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.01, random_state=42)
 
     print('x_train shape:', x_train.shape)
     print(x_train.shape[0], 'train samples')

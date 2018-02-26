@@ -14,7 +14,7 @@ N = len(subject_ids)
 print(N)
 
 def predict(zone):
-    model_path = '/media/ben/Data/kaggle/passenger_screening_dataset/stage1/{0}.h5'.format(zone)
+    model_path = '/media/ben/Data/kaggle/passenger_screening_dataset/stage1/models/epoch50_99_percent/{0}.h5'.format(zone)
     model = load_model(model_path)
 
     x_test = np.zeros((N, 16, 25, 25))
@@ -41,8 +41,14 @@ def predict(zone):
 
     y_test = model.predict(x_test, verbose=0)
     y_test = y_test[:,1]
+
+    for i in range(x_test.shape[0]):
+        # if zone in [2,4,7,10,12] and np.all(x_test[i] <= 0.1):
+        if np.all(x_test[i] <= 0.1):
+            y_test[i] = -1
+
     y_test = y_test.reshape(N, 16)
-    y_test = np.mean(y_test, axis=1)
+    y_test = np.average(y_test, weights=(y_test >= 0), axis=1)
     print(y_test)
     print(y_test.shape)
     print(zone, np.mean(y_test))
